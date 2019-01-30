@@ -22,6 +22,9 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhiteSpace()
 
 	switch l.ch {
+	case ';':
+		tok.Literal = ";"
+		tok.Type = token.SEMICOLON
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF

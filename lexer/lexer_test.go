@@ -8,7 +8,7 @@ import (
 func TestNextToken(t *testing.T) {
 	input := `
 7
-773
+773;
 `
 
 	tests := []struct {
@@ -17,6 +17,7 @@ func TestNextToken(t *testing.T) {
 	}{
 		{token.INT, "7"},
 		{token.INT, "773"},
+		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
 	}
