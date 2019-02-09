@@ -1,0 +1,79 @@
+package compiler
+
+import (
+	"fmt"
+	llvm "github.com/llir/llvm/ir"
+	"github.com/llir/llvm/ir/constant"
+	"github.com/llir/llvm/ir/types"
+	"github.com/llir/llvm/ir/value"
+	"tamago/ast"
+)
+
+type Compiler struct {
+	Module *llvm.Module
+	CurrentFunc *llvm.Func
+	CurrentBlock *llvm.Block
+}
+
+func New() *Compiler {
+	m := llvm.NewModule()
+	return &Compiler{
+		Module: m,
+		CurrentFunc: nil,
+	}
+}
+
+func (c *Compiler) Compile(node ast.Node) (string, error) {
+	program, ok := node.(*ast.Program)
+	if !ok {
+		return "", fmt.Errorf("node must be *ast.Program")
+	}
+
+	if err := c.compileProgram(program); err != nil {
+		return "", err
+	}
+
+	return c.Module.String(), nil
+}
+
+func (c *Compiler) compileProgram(node *ast.Program) error {
+	f := c.Module.NewFunc("main", types.I64)
+	b := f.NewBlock("entry")
+
+	c.CurrentFunc = f
+	c.CurrentBlock = b
+
+	var retVal value.Value
+	for _, stmt := range node.Statements {
+		var err error
+		retVal, err = c.compileStatement(stmt)
+		if err != nil {
+			return err
+		}
+	}
+
+	b.NewRet(retVal)
+
+	return nil
+}
+
+func (c *Compiler) compileStatement(node ast.Statement) (value.Value, error) {
+	switch node := node.(type) {
+	case *ast.ExpressionStatement:
+		return c.compileExpression(node.Expression)
+	}
+	return nil, nil
+}
+
+func (c *Compiler) compileExpression(node ast.Expression) (value.Value, error) {
+	switch node := node.(type) {
+	case *ast.IntegerLiteral:
+		return c.compileIntegerLiteral(node)
+	}
+	return nil, nil
+}
+
+func (c *Compiler) compileIntegerLiteral(node *ast.IntegerLiteral) (value.Value, error) {
+	return constant.NewInt(types.I64, node.Value), nil
+}
+

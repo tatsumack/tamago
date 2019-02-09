@@ -36,7 +36,6 @@ func (p *Parser) ParseProgram() *ast.Program {
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
 		}
-		println(p.curToken.Type)
 		p.nextToken()
 	}
 
@@ -75,7 +74,6 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	}
 
 	lit.Value = value
-	println(value)
 	return lit
 }
 
