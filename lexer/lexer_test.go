@@ -9,6 +9,11 @@ func TestNextToken(t *testing.T) {
 	input := `
 7
 773;
+
+21 + 21
+43 - 1
+21 * 2
+84 / 2
 `
 
 	tests := []struct {
@@ -19,6 +24,22 @@ func TestNextToken(t *testing.T) {
 		{token.INT, "773"},
 		{token.SEMICOLON, ";"},
 
+		{token.INT, "21"},
+		{token.PLUS, "+"},
+		{token.INT, "21"},
+
+		{token.INT, "43"},
+		{token.MINUS, "-"},
+		{token.INT, "1"},
+
+		{token.INT, "21"},
+		{token.ASTERISK, "*"},
+		{token.INT, "2"},
+
+		{token.INT, "84"},
+		{token.SLASH, "/"},
+		{token.INT, "2"},
+
 		{token.EOF, ""},
 	}
 
@@ -28,7 +49,7 @@ func TestNextToken(t *testing.T) {
 		tok := l.NextToken()
 
 		if tok.Type != tt.expectedType {
-			t.Fatalf("tests[%d] - tokentype wrong. expected=%q, got=%q", i, tt.expectedType, tok.Type)
+			t.Fatalf("tests[%d] - token type wrong. expected=%q, got=%q", i, tt.expectedType, tok.Type)
 		}
 
 		if tok.Literal != tt.expectedLiteral {

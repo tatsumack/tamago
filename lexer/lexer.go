@@ -23,11 +23,17 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case ';':
-		tok.Literal = ";"
-		tok.Type = token.SEMICOLON
+		tok = newToken(token.SEMICOLON, l.ch)
 	case 0:
-		tok.Literal = ""
-		tok.Type = token.EOF
+		tok = newToken(token.EOF, l.ch)
+	case '+':
+		tok = newToken(token.PLUS, l.ch)
+	case '-':
+		tok = newToken(token.MINUS, l.ch)
+	case '*':
+		tok = newToken(token.ASTERISK, l.ch)
+	case '/':
+		tok = newToken(token.SLASH, l.ch)
 	default:
 		if isDigit(l.ch) {
 			tok.Literal = l.readNumber()
@@ -37,6 +43,14 @@ func (l *Lexer) NextToken() token.Token {
 	}
 
 	l.readChar()
+	return tok
+}
+
+func newToken(tokenType token.TokenType, ch byte) token.Token {
+	tok := token.Token{Type: tokenType, Literal: string(ch)}
+	if tokenType == token.EOF {
+		tok.Literal = ""
+	}
 	return tok
 }
 
