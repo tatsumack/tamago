@@ -10,15 +10,15 @@ import (
 )
 
 type Compiler struct {
-	Module *llvm.Module
-	CurrentFunc *llvm.Func
+	Module       *llvm.Module
+	CurrentFunc  *llvm.Func
 	CurrentBlock *llvm.Block
 }
 
 func New() *Compiler {
 	m := llvm.NewModule()
 	return &Compiler{
-		Module: m,
+		Module:      m,
 		CurrentFunc: nil,
 	}
 }
@@ -67,13 +67,38 @@ func (c *Compiler) compileStatement(node ast.Statement) (value.Value, error) {
 
 func (c *Compiler) compileExpression(node ast.Expression) (value.Value, error) {
 	switch node := node.(type) {
+	case *ast.InfixExpression:
+		left, err := c.compileExpression(node.Left)
+		if err != nil {
+			return nil, err
+		}
+
+		right, err := c.compileExpression(node.Right)
+		if err != nil {
+			return nil, err
+		}
+
+		return c.compileInfixExpression(node, left, right)
 	case *ast.IntegerLiteral:
 		return c.compileIntegerLiteral(node)
 	}
 	return nil, nil
 }
 
+func (c *Compiler) compileInfixExpression(node *ast.InfixExpression, left value.Value, right value.Value) (value.Value, error) {
+	switch (node.Operator) {
+	case "+":
+		return c.CurrentBlock.NewAdd(left, right), nil
+	case "-":
+		return c.CurrentBlock.NewSub(left, right), nil
+	case "*":
+		return c.CurrentBlock.NewMul(left, right), nil
+	case "/":
+		return c.CurrentBlock.NewSDiv(left, right), nil
+	}
+	return nil, fmt.Errorf("invalid operator %s", node.Operator)
+}
+
 func (c *Compiler) compileIntegerLiteral(node *ast.IntegerLiteral) (value.Value, error) {
 	return constant.NewInt(types.I64, node.Value), nil
 }
-
