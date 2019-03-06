@@ -14,6 +14,8 @@ func TestNextToken(t *testing.T) {
 43 - 1
 21 * 2
 84 / 2
+
+x := 1
 `
 
 	tests := []struct {
@@ -39,6 +41,10 @@ func TestNextToken(t *testing.T) {
 		{token.INT, "84"},
 		{token.SLASH, "/"},
 		{token.INT, "2"},
+
+		{token.IDENT, "x"},
+		{token.SHORTDEC, ":="},
+		{token.INT, "1"},
 
 		{token.EOF, ""},
 	}

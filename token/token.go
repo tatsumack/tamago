@@ -15,6 +15,7 @@ const (
 	INT    = "INT"
 	STRING = "STRING"
 
+	SHORTDEC = ":="
 	ASSIGN   = "="
 	PLUS     = "+"
 	MINUS    = "-"
